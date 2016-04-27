@@ -81,15 +81,15 @@ public class RSA {
         return cachedP;
     }
 
-    public BigInteger encrypt(BigInteger message, BigInteger key){
-        return encryptDecrypt(message, key);
+    public BigInteger encrypt(BigInteger key, BigInteger message){
+        return encryptDecrypt(key, message);
     }
 
-    public BigInteger decrypt(BigInteger message, BigInteger key){
-        return encryptDecrypt(message, key);
+    public BigInteger decrypt(BigInteger key, BigInteger message){
+        return encryptDecrypt(key, message);
     }
 
-    private BigInteger encryptDecrypt(BigInteger message, BigInteger key){
+    private BigInteger encryptDecrypt(BigInteger key, BigInteger message){
         return message.modPow(key, getN());
     }
 
@@ -97,20 +97,27 @@ public class RSA {
     public BigInteger sign(BigInteger privateKey, BigInteger message){
 
         System.out.println("Starting hashing operation");
-        double start = System.currentTimeMillis();
+        double hashStart = System.currentTimeMillis();
         sha_256.update(message.toByteArray());
         byte[] h = sha_256.digest();
-        double stop = System.currentTimeMillis();
-        System.out.println("Time elapsed: " + ((stop-start)/1000.0));
-        BigInteger hash = new BigInteger(h);
-        return encrypt(hash, privateKey);
+        double hashStop = System.currentTimeMillis();
+        System.out.println("Time elapsed for hash: " + ((hashStop-hashStart)/1000.0));
+        BigInteger hash = new BigInteger(1,h);
+        System.out.println("Starting signing operation");
+        double signStart = System.currentTimeMillis();
+        BigInteger signature = encrypt(privateKey, hash);
+        double signStop = System.currentTimeMillis();
+
+        System.out.println("Time elapsed for signing: " + ((signStop-signStart)/1000.0));
+
+        return signature;
     }
 
     public boolean verify(BigInteger publicKey, BigInteger message, BigInteger signature){
         sha_256.update(message.toByteArray());
         byte[] h = sha_256.digest();
-        BigInteger hash = new BigInteger(h);
-        return decrypt(signature, publicKey).equals(hash);
+        BigInteger hash = new BigInteger(1,h);
+        return decrypt(publicKey,signature).equals(hash);
     }
 
 

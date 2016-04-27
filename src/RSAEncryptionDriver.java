@@ -14,10 +14,9 @@ public class RSAEncryptionDriver {
         System.out.println("Key generated: " + privateKey);
         System.out.println("n value is " + n);
         System.out.println("n length in bits is " + n.bitLength());
-        int message = Integer.parseInt(args[0]);
-        BigInteger m = new BigInteger("" + message);
+        BigInteger message = new BigInteger(args[0]);
         System.out.println("Message to be encrypted: " + message);
-        BigInteger cipher = rsa.encrypt(m, rsa.getPublicKey());
+        BigInteger cipher = rsa.encrypt(rsa.getPublicKey(),message);
         System.out.println("Cipher text generated: " + cipher);
         BigInteger messageAfter = rsa.decrypt(privateKey, cipher);
         System.out.println("Decrypted message is: " + messageAfter);

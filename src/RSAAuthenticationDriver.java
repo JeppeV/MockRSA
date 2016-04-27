@@ -26,7 +26,7 @@ public class RSAAuthenticationDriver {
         boolean verified = rsa.verify(rsa.getPublicKey(), message, sign);
         System.out.println("Verified is: " + verified);
 
-
+        String output = "We have ";
 
     }
 }
