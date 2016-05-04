@@ -65,8 +65,6 @@ public class RSA {
         }
         return cachedQ;
 
-
-
     }
 
     private BigInteger getP(int k, Random r){
@@ -105,7 +103,7 @@ public class RSA {
         BigInteger hash = new BigInteger(1,h);
         System.out.println("Starting signing operation");
         double signStart = System.currentTimeMillis();
-        BigInteger signature = encrypt(privateKey, hash);
+        BigInteger signature = encrypt(privateKey, hash); //remember to switch back to hash
         double signStop = System.currentTimeMillis();
 
         System.out.println("Time elapsed for signing: " + ((signStop-signStart)/1000.0));
@@ -117,7 +115,7 @@ public class RSA {
         sha_256.update(message.toByteArray());
         byte[] h = sha_256.digest();
         BigInteger hash = new BigInteger(1,h);
-        return decrypt(publicKey,signature).equals(hash);
+        return decrypt(publicKey,signature).equals(hash); //remember to switch back to hash
     }
 
 
