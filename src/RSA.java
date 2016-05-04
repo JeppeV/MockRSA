@@ -91,34 +91,39 @@ public class RSA {
         return message.modPow(key, getN());
     }
 
-
     public BigInteger sign(BigInteger privateKey, BigInteger message){
+        BigInteger hash = generateHash(message);
+        System.out.println("Signing...");
+        double signStart = System.currentTimeMillis();
+        BigInteger signature = encrypt(privateKey, hash);
+        double signStop = System.currentTimeMillis();
+        System.out.println("Time elapsed for signing with hashing: " + ((signStop-signStart)/1000.0));
+        return signature;
+    }
 
-        System.out.println("Starting hashing operation");
+    public boolean verify(BigInteger publicKey, BigInteger message, BigInteger signature){
+        BigInteger hash = generateHash(message);
+        return decrypt(publicKey,signature).equals(hash);
+    }
+
+    public BigInteger signWithoutHash(BigInteger privateKey, BigInteger message){
+
+        System.out.println("Signing...");
+        double signStart = System.currentTimeMillis();
+        BigInteger signature = encrypt(privateKey, message);
+        double signStop = System.currentTimeMillis();
+        System.out.println("Time elapsed for signing without hash: " + ((signStop-signStart)/1000.0));
+        return signature;
+    }
+
+    private BigInteger generateHash(BigInteger message){
+        System.out.println("Hashing...");
         double hashStart = System.currentTimeMillis();
         sha_256.update(message.toByteArray());
         byte[] h = sha_256.digest();
         double hashStop = System.currentTimeMillis();
         System.out.println("Time elapsed for hash: " + ((hashStop-hashStart)/1000.0));
-        BigInteger hash = new BigInteger(1,h);
-        System.out.println("Starting signing operation");
-        double signStart = System.currentTimeMillis();
-        BigInteger signature = encrypt(privateKey, hash); //remember to switch back to hash
-        double signStop = System.currentTimeMillis();
+        return new BigInteger(1,h);
 
-        System.out.println("Time elapsed for signing: " + ((signStop-signStart)/1000.0));
-
-        return signature;
     }
-
-    public boolean verify(BigInteger publicKey, BigInteger message, BigInteger signature){
-        sha_256.update(message.toByteArray());
-        byte[] h = sha_256.digest();
-        BigInteger hash = new BigInteger(1,h);
-        return decrypt(publicKey,signature).equals(hash); //remember to switch back to hash
-    }
-
-
-
-
 }
