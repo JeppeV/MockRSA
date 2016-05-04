@@ -4,6 +4,8 @@ bin/
 TEST-RESULT/
 .idea/
 
+*.iml
+
 # Compiled source #
 ###################
 *.com
