@@ -1,0 +1,1 @@
+A mock implementation of RSA with encryption and authentication capabilities.

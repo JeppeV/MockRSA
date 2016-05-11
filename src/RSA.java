@@ -10,7 +10,6 @@ public class RSA {
 
     private BigInteger one = BigInteger.ONE;
     private BigInteger e = new BigInteger("3");
-    private BigInteger n = BigInteger.ZERO;
     private BigInteger cachedQ = null, cachedP = null;
 
     private MessageDigest sha_256;
@@ -23,17 +22,9 @@ public class RSA {
         }
     }
 
-    public BigInteger getN(){
-        return n;
-    }
-
-    public BigInteger getPublicKey() {
-        return e;
-    }
-
-    public BigInteger keyGen(int k){
+    public KeyObject generatePrivateKey(int k){
         Random r = new Random();
-        BigInteger p, q;
+        BigInteger p, q, n;
         int k1 = k/2;
         int k2 = (int) Math.ceil(k/2);
         while(true){
@@ -51,7 +42,7 @@ public class RSA {
         }
         BigInteger qMinusOne = q.subtract(one);
         BigInteger pMinusOne = p.subtract(one);
-        return e.modInverse(qMinusOne.multiply(pMinusOne));
+        return new KeyObject(e.modInverse(qMinusOne.multiply(pMinusOne)), n);
     }
 
     private BigInteger getQ(int k, Random r){
@@ -79,50 +70,37 @@ public class RSA {
         return cachedP;
     }
 
-    public BigInteger encrypt(BigInteger key, BigInteger message){
-        return encryptDecrypt(key, message);
+    public BigInteger encrypt(KeyObject key, BigInteger message){
+        return encryptDecrypt(key.getKey(), key.getN(), message);
     }
 
-    public BigInteger decrypt(BigInteger key, BigInteger message){
-        return encryptDecrypt(key, message);
+    public BigInteger decrypt(KeyObject key, BigInteger message){
+        return encryptDecrypt(key.getKey(), key.getN(), message);
     }
 
-    private BigInteger encryptDecrypt(BigInteger key, BigInteger message){
-        return message.modPow(key, getN());
+    private BigInteger encryptDecrypt(BigInteger key, BigInteger n, BigInteger message){
+        return message.modPow(key, n);
     }
 
-    public BigInteger sign(BigInteger privateKey, BigInteger message){
+    public BigInteger sign(KeyObject privateKey, BigInteger message){
         BigInteger hash = generateHash(message);
-        System.out.println("Signing...");
-        double signStart = System.currentTimeMillis();
         BigInteger signature = encrypt(privateKey, hash);
-        double signStop = System.currentTimeMillis();
-        System.out.println("Time elapsed for signing with hashing: " + ((signStop-signStart)/1000.0));
         return signature;
     }
 
-    public boolean verify(BigInteger publicKey, BigInteger message, BigInteger signature){
+    public boolean verify(KeyObject publicKey, BigInteger message, BigInteger signature){
         BigInteger hash = generateHash(message);
-        return decrypt(publicKey,signature).equals(hash);
+        return decrypt(publicKey, signature).equals(hash);
     }
 
-    public BigInteger signWithoutHash(BigInteger privateKey, BigInteger message){
-
-        System.out.println("Signing...");
-        double signStart = System.currentTimeMillis();
+    public BigInteger signWithoutHash(KeyObject privateKey, BigInteger message){
         BigInteger signature = encrypt(privateKey, message);
-        double signStop = System.currentTimeMillis();
-        System.out.println("Time elapsed for signing without hash: " + ((signStop-signStart)/1000.0));
         return signature;
     }
 
     private BigInteger generateHash(BigInteger message){
-        System.out.println("Hashing...");
-        double hashStart = System.currentTimeMillis();
         sha_256.update(message.toByteArray());
         byte[] h = sha_256.digest();
-        double hashStop = System.currentTimeMillis();
-        System.out.println("Time elapsed for hash: " + ((hashStop-hashStart)/1000.0));
         return new BigInteger(1,h);
 
     }

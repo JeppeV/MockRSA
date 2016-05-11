@@ -1,6 +1,3 @@
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.math.BigInteger;
 import java.util.Random;
 
@@ -33,15 +30,10 @@ public class RSAAuthenticationDriver {
         BigInteger message = new BigInteger(10000000, new Random());
 
         System.out.println("Generating private key with k = " + k);
-        BigInteger privateKey = rsa.keyGen(k);
-        BigInteger n = rsa.getN();
-        System.out.println("length of n is " + n.bitLength());
+        KeyObject privateKey = rsa.generatePrivateKey(k);
+        KeyObject publicKey = new KeyObject(new BigInteger("7"), privateKey.getN());
         BigInteger sign = rsa.sign(privateKey, message);
-        System.out.println("");
-        BigInteger signWithoutHash = rsa.signWithoutHash(privateKey, message);
-
-        System.out.println("");
-        boolean verified = rsa.verify(rsa.getPublicKey(), message, sign);
+        boolean verified = rsa.verify(publicKey, message, sign);
         System.out.println("Verified is: " + verified);
 
     }
